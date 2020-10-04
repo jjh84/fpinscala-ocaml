@@ -1,0 +1,4 @@
+(executable
+ (public_name fpis_ocaml)
+ (name main)
+ (libraries fpis_ocaml base cmdliner))
