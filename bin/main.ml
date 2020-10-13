@@ -1,2 +1,2 @@
 let () = 
-  print_endline "Hello world"
+  CandyMachine.start ()
