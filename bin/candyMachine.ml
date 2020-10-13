@@ -32,7 +32,7 @@ module Machine = struct
   let step action output =
     let* locked, candies, _ = get in
     match locked, candies, action with
-    | _, 0, _ -> return (Nothing :: output)
+    | _,     0, _    -> return (Nothing :: output)
     | true,  _, Coin -> insert_coin output
     | false, _, Coin -> return (Nothing :: output)
     | false, _, Turn -> get_candy output
@@ -51,7 +51,7 @@ module Machine = struct
       | Candy -> printf "Got Candy!\n" 
       | Nothing -> printf "Nothing\n" 
       | Locked -> printf "Locked\n") (List.rev out) in
-    printf "State => your locked? %s, coins: %d, candies: %d" (string_of_bool locked) coins candies
+    printf "State => locked? %s, coins: %d, candies: %d" (string_of_bool locked) coins candies
 end
 
 let start () =
