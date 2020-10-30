@@ -1,4 +1,4 @@
 (executable
- (public_name fpis_ocaml)
+ (public_name fpiso)
  (name main)
- (libraries fpis_ocaml core_kernel cmdliner))
+ (libraries fpis_ocaml core_kernel cmdliner fmt fmt.tty logs.fmt logs.cli))

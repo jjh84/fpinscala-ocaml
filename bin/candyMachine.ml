@@ -1,5 +1,17 @@
+open Cmdliner
 open Core_kernel
 open Fpis_ocaml.Monad
+
+let doc = "candyMachine"
+
+let sdocs = Manpage.s_common_options
+
+let man_xrefs = [`Main]
+
+let man = [
+  `S Manpage.s_description
+  ; `P "candyMachine will execute an example of State Monad"
+  ]
 
 type action = 
   | Coin 
@@ -56,3 +68,14 @@ end
 
 let start () =
   Machine.simulateMachine [Coin; Turn; Coin; Turn; Coin; Turn; Coin; Turn]
+
+
+let info = Term.info "candyMachine" ~doc ~sdocs ~man ~man_xrefs
+
+let term =
+  let open Common.Let_syntax in
+  let+ _term = Common.term in
+  start ();
+  Ok () |> Common.handle_errors
+  
+let cmd = term, info 
