@@ -29,4 +29,4 @@ Available Commands:
 
 ## 요구사항
 
-Monad, Applicative를 위한 (Let_syntax)[https://caml.inria.fr/pub/docs/manual-ocaml/bindingops.html]를 이용하기 때문에 OCaml 컴파일러 4.08.0 이상에서 컴파일 가능하다.
+Monad, Applicative를 위한 [Let_syntax](https://caml.inria.fr/pub/docs/manual-ocaml/bindingops.html)를 이용하기 때문에 OCaml 컴파일러 4.08.0 이상에서 컴파일 가능하다.
