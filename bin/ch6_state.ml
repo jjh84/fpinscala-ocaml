@@ -54,6 +54,28 @@ module SimpleRng = struct
   let nonNegativeEven = 
     map nonNegativeInt (fun v -> v - (v mod 2))
 
+  let nonNegativeLessThan n = 
+    map nonNegativeInt (fun v -> v mod n)
+
+  let rec nonNegativeLessThan_v2 n =
+    fun rng ->
+      let n1, seed1 = nonNegativeInt rng in 
+      let n2 = n1 mod n in 
+      if (n1 + (n-1) - n2 >= 0) then 
+        (n2, seed1)
+      else 
+        nonNegativeLessThan_v2 n seed1
+
+  let flatMap r f = 
+    fun seed -> 
+      let n1, seed1 = r seed in 
+      f n1 seed1
+
+  let rec nonNegativeLessThan_v3 n = 
+    flatMap nonNegativeInt (fun v -> 
+      let n = v mod n in 
+      if (v + (n-1) - n >= 0) then unit n 
+      else nonNegativeLessThan_v3 n)
 end
 
 let () =
@@ -62,5 +84,5 @@ let () =
   Printf.printf "%d\n" n1;
   let n2, rng3 = SimpleRng.int rng2 in 
   Printf.printf "%d\n" n2;
-  let n3, rng4 = SimpleRng.nonNegativeEven rng3 in 
+  let n3, rng4 = SimpleRng.nonNegativeLessThan_v3 1000 rng3 in 
   Printf.printf "%d\n" n3
