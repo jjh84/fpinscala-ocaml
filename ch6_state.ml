@@ -24,8 +24,6 @@ module State(S : sig type t end) = struct
       f n s'
 end
 
-module Int64StateMonad = State(struct type t = int64 end)
-
 module SimpleRng = struct 
   
   type state = int64
