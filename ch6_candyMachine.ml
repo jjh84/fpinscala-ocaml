@@ -53,5 +53,5 @@ module Machine = struct
     printf "State => locked? %s, coins: %d, candies: %d" (string_of_bool locked) coins candies
 end
 
-let start =
+let () =
   Machine.simulateMachine [Coin; Turn; Coin; Turn; Coin; Turn; Coin; Turn]

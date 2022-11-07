@@ -3,8 +3,8 @@
     (flags (:standard -w -50 -w -32 -w -27))))
 
 (executables
- (names candyMachine)
- (modules monad candyMachine))
+ (names ch6_candyMachine)
+ (modules monad ch6_candyMachine))
 
 (executables
  (names ch6_state)

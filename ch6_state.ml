@@ -1,81 +1,94 @@
+module State(S : sig type t end) = struct 
+
+  type state = S.t 
+
+  type 'a t = state -> ('a * state)
+
+  let return v = 
+    fun s -> (v, s)
+
+  let map m f = 
+    fun s -> 
+      let n, s' = m s in 
+      (f n, s')
+
+  let map2 ma mb f = 
+    fun s ->
+      let n1, s1 = ma s in 
+      let n2, s2 = mb s1 in 
+      (f n1 n2, s2)
+
+  let flatMap m f = 
+    fun s -> 
+      let n, s' = m s in 
+      f n s'
+end
+
+module Int64StateMonad = State(struct type t = int64 end)
 
 module SimpleRng = struct 
+  
+  type state = int64
+
+  module M = State(struct type t = state end)
 
   let ( +! ) = Int64.add 
   let ( *! ) = Int64.mul
   let ( &! ) = Int64.logand
 
-  type seed = int64
-  type 'a rand = seed -> (int * seed)
+  let create state = 
+    (0, state)
 
-  let create seed = 
-    (0, seed)
+  let nextInt state =
+    let newState = (state *! 0x5DEECE66DL +! 0xBL) &! 0xFFFFFFFFFFFFL in 
+    let n = Int64.shift_right_logical newState 16 |> Int64.to_int in 
+    (n, newState)
 
-  let nextInt seed =
-    let newSeed = (seed *! 0x5DEECE66DL +! 0xBL) &! 0xFFFFFFFFFFFFL in 
-    let n = Int64.shift_right_logical newSeed 16 |> Int64.to_int in 
-    (n, newSeed)
-
-  let int : int rand = 
+  let int = 
     nextInt 
 
-  let randomPair seed = 
-    let n1, seed1 = nextInt seed in 
-    let n2, seed2 = nextInt seed1 in 
-    ((n1, n2), seed2)
+  let randomPair state = 
+    let n1, state1 = nextInt state in 
+    let n2, state2 = nextInt state1 in 
+    ((n1, n2), state2)
 
-  let nonNegativeInt seed = 
-    let n1, seed1 = nextInt seed in 
+  let nonNegativeInt state = 
+    let n1, state1 = nextInt state in 
     if n1 < 0 then 
-      (abs(n1+1), seed1)
+      (abs(n1+1), state1)
     else 
-      (n1, seed1)
-
-  let unit v : int rand = 
-    fun seed -> (v, seed)
-
-  let map r f = 
-    fun seed -> 
-      let n1, seed1 = r seed in 
-      (f n1, seed1)
-
-  let map2 ra rb f = 
-    fun seed ->
-      let n1, seed1 = ra seed in 
-      let n2, seed2 = rb seed1 in 
-      (f n1 n2, seed2)
+      (n1, state1)
 
   let both ra rb = 
-    map2 ra rb (fun a b -> (a, b))
+    M.map2 ra rb (fun a b -> (a, b))
 
   let randIntPair = 
     both nextInt nextInt
 
   let nonNegativeEven = 
-    map nonNegativeInt (fun v -> v - (v mod 2))
+    M.map nonNegativeInt (fun v -> v - (v mod 2))
 
   let nonNegativeLessThan n = 
-    map nonNegativeInt (fun v -> v mod n)
+    M.map nonNegativeInt (fun v -> v mod n)
 
   let rec nonNegativeLessThan_v2 n =
     fun rng ->
-      let n1, seed1 = nonNegativeInt rng in 
+      let n1, state1 = nonNegativeInt rng in 
       let n2 = n1 mod n in 
       if (n1 + (n-1) - n2 >= 0) then 
-        (n2, seed1)
+        (n2, state1)
       else 
-        nonNegativeLessThan_v2 n seed1
-
-  let flatMap r f = 
-    fun seed -> 
-      let n1, seed1 = r seed in 
-      f n1 seed1
+        nonNegativeLessThan_v2 n state1
 
   let rec nonNegativeLessThan_v3 n = 
-    flatMap nonNegativeInt (fun v -> 
+    M.flatMap nonNegativeInt (fun v -> 
       let n = v mod n in 
-      if (v + (n-1) - n >= 0) then unit n 
+      if (v + (n-1) - n >= 0) then M.return n 
       else nonNegativeLessThan_v3 n)
+
+  let map r f = 
+    M.flatMap r (fun v -> M.return (f v))
+
 end
 
 let () =
