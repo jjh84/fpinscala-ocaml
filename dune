@@ -1,0 +1,16 @@
+(env
+  (dev
+    (flags (:standard -w -50 -w -32 -w -27))))
+
+(executables
+ (names candyMachine)
+ (modules monad candyMachine))
+
+(executables
+ (names ch6_state)
+ (modules ch6_state))
+
+(executables
+ (names wc)
+ (modules monoid wc)
+ (libraries stdio base))

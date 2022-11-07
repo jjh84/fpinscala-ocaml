@@ -1,3 +1,0 @@
-(test
- (name fpis_ocaml)
- (libraries base cmdliner))

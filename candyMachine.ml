@@ -1,17 +1,4 @@
-open Cmdliner
-open Core_kernel
-open Fpis_ocaml.Monad
-
-let doc = "candyMachine"
-
-let sdocs = Manpage.s_common_options
-
-let man_xrefs = [`Main]
-
-let man = [
-  `S Manpage.s_description
-  ; `P "candyMachine will execute an example of State Monad"
-  ]
+open Monad
 
 type action = 
   | Coin 
@@ -51,14 +38,14 @@ module Machine = struct
     | true,  _, Turn -> return (Locked :: output)
 
   let iterm ~sub =
-    List.fold ~init:(return []) ~f:(fun m act -> 
-      m >>= fun output -> sub act output) 
+    List.fold_left (fun m act -> 
+      m >>= fun output -> sub act output) (return [])
 
   let simulateMachine inputs =
     let open Printf in
     let m = iterm ~sub:step inputs in
     let out, (locked, candies, coins) = runState m ~init:(true, 5, 10) in
-    let () = List.iter ~f:(fun output ->
+    let () = List.iter (fun output ->
       match output with
       | Candy -> printf "Got Candy!\n" 
       | Nothing -> printf "Nothing\n" 
@@ -66,16 +53,5 @@ module Machine = struct
     printf "State => locked? %s, coins: %d, candies: %d" (string_of_bool locked) coins candies
 end
 
-let start () =
+let start =
   Machine.simulateMachine [Coin; Turn; Coin; Turn; Coin; Turn; Coin; Turn]
-
-
-let info = Term.info "candyMachine" ~doc ~sdocs ~man ~man_xrefs
-
-let term =
-  let open Common.Let_syntax in
-  let+ _term = Common.term in
-  start ();
-  Ok () |> Common.handle_errors
-  
-let cmd = term, info 

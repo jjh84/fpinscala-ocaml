@@ -1,17 +1,5 @@
 open Base
-open Cmdliner
-open Fpis_ocaml.Monoid
-
-let doc = "Word Count"
-
-let sdocs = Manpage.s_common_options
-
-let man_xrefs = [`Main]
-
-let man = [
-  `S Manpage.s_description
-  ; `P "$(wc) will count words in given string."
-  ]
+open Monoid
 
 type wc = 
   | Stub of string
@@ -51,16 +39,6 @@ let wc so =
   | Stub s -> unstub s
   | Part (l, w, r) -> (unstub l) + w + (unstub r)
 
-let info = Term.info "wc" ~doc ~sdocs ~man ~man_xrefs
-
-let term =
-  let open Common.Let_syntax in
-  let+ _term = Common.term
-  and+ str =
-    let doc = "String for word counting" in
-    Arg.(value & pos 0 (some string) None & info [] ~doc)
-  in
-  Stdio.printf "wc: %d\n" (wc str);
-  Ok () |> Common.handle_errors
-  
-let cmd = term, info 
+let () = 
+  let n = wc (Some ("hello world!")) in 
+  Stdio.printf "%d\n" n

@@ -1,4 +1,0 @@
-(executable
- (public_name fpiso)
- (name main)
- (libraries fpis_ocaml core_kernel cmdliner fmt fmt.tty logs.fmt logs.cli))
