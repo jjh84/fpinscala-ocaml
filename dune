@@ -11,6 +11,10 @@
  (modules ch6_state))
 
 (executables
- (names wc)
- (modules monoid wc)
- (libraries stdio base))
+ (names ch10_monoid)
+ (modules ch10_monoid))
+
+; (executables
+;  (names wc)
+;  (modules monoid wc)
+;  (libraries stdio base))

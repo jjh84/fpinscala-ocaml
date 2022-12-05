@@ -44,3 +44,18 @@ module BooleanAnd : Monoid with type t = bool = struct
   let op = (&&)
   let zero = true
 end
+
+module Concatenate (M : Monoid) = struct 
+  let concatenate lst = List.fold_left M.op M.zero lst
+end
+
+module SC = Concatenate (StringMonoid)
+module IC = Concatenate (IntAddition)
+
+let () = 
+  let lst = ["Hic"; "Est"; "Index"] in 
+  let l = List.fold_left StringMonoid.op StringMonoid.zero lst in
+  let r = List.fold_right StringMonoid.op lst StringMonoid.zero in
+  let c = SC.concatenate lst in
+  let s = IC.concatenate [1;2;3;4;5;6] in
+  Printf.printf "%s %s %s %d\n" l r c s
